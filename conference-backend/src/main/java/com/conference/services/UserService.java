@@ -1,6 +1,7 @@
 package com.conference.services;
 
 import com.conference.exceptions.EmailAlreadyTakenException;
+import com.conference.exceptions.EmailFailedToSendException;
 import com.conference.exceptions.UserDoesNotExistException;
 import com.conference.models.ApplicationUser;
 import com.conference.models.RegistrationObject;
@@ -17,11 +18,13 @@ public class UserService {
 
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
+    private final MailService mailService;
 
     @Autowired
-    public UserService(UserRepository userRepo, RoleRepository roleRepo) {
+    public UserService(UserRepository userRepo, RoleRepository roleRepo, MailService mailService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
+        this.mailService = mailService;
     }
 
     public ApplicationUser getUserByUsername(String username) {
@@ -69,6 +72,12 @@ public class UserService {
     public void generateEmailVerification(String username) {
         ApplicationUser user = userRepo.findByUsername(username).orElseThrow(UserDoesNotExistException::new);
         user.setVerification(generateVerificationNumber());
+        try {
+            mailService.sendEmail(user.getEmail(),"Your verification code","Here is your verification code: "+user.getVerification());
+            userRepo.save(user);
+        } catch (Exception e) {
+            throw new EmailFailedToSendException();
+        }
         userRepo.save(user);
     }
 

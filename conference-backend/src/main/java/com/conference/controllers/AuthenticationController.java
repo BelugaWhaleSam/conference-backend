@@ -1,6 +1,7 @@
 package com.conference.controllers;
 
 import com.conference.exceptions.EmailAlreadyTakenException;
+import com.conference.exceptions.EmailFailedToSendException;
 import com.conference.exceptions.UserDoesNotExistException;
 import com.conference.models.ApplicationUser;
 import com.conference.models.RegistrationObject;
@@ -21,6 +22,11 @@ public class AuthenticationController {
     @Autowired
     public AuthenticationController(UserService userService) {
         this.userService = userService;
+    }
+
+    @ExceptionHandler({EmailFailedToSendException.class})
+    public ResponseEntity<String> handleFailedEmail() {
+        return new ResponseEntity<String>("Email failed to send, try again in a moment", HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler({EmailAlreadyTakenException.class})
