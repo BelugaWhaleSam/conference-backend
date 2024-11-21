@@ -1,2 +1,4 @@
 /.metadata/
-*.json
+**/resources/*.json
+**/storedCredential
+
