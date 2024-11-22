@@ -48,14 +48,14 @@ public class ApplicationUser {
 
     @Column(nullable=true)
     @JsonIgnore
-    private long verification;
+    private Long verification;
 
     public ApplicationUser() {
         this.authorities = new HashSet<>();
         this.enabled=false;
     }
 
-    public ApplicationUser(Integer userId, String firstName, String lastName, String email, String phone, Date dateOfBirth, String username, String password, Set<Role> authorities) {
+    public ApplicationUser(Integer userId, String firstName, String lastName, String email, String phone, Date dateOfBirth, String username, String password, Set<Role> authorities, Boolean enabled, Long verification) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -65,6 +65,8 @@ public class ApplicationUser {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.enabled = enabled;
+        this.verification = verification;
     }
 
     public Integer getUserId() {
@@ -103,6 +105,14 @@ public class ApplicationUser {
         return authorities;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public Long getVerification() {
+        return verification;
+    }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -139,19 +149,11 @@ public class ApplicationUser {
         this.authorities = authorities;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public long getVerification() {
-        return verification;
-    }
-
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public void setVerification(long verification) {
+    public void setVerification(Long verification) {
         this.verification = verification;
     }
 

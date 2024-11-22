@@ -2,6 +2,7 @@ package com.conference.controllers;
 
 import com.conference.exceptions.EmailAlreadyTakenException;
 import com.conference.exceptions.EmailFailedToSendException;
+import com.conference.exceptions.IncorrectVerificationCodeException;
 import com.conference.exceptions.UserDoesNotExistException;
 import com.conference.models.ApplicationUser;
 import com.conference.models.RegistrationObject;
@@ -39,6 +40,11 @@ public class AuthenticationController {
         return new ResponseEntity<String>("The user does not exist", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler({IncorrectVerificationCodeException.class})
+    public ResponseEntity<String> incorrectCodeHandler() {
+        return new ResponseEntity<String>("The code passed did not match the users verification code", HttpStatus.CONFLICT);
+    }
+
     @PostMapping("/register")
     public ApplicationUser registerUser(@RequestBody RegistrationObject ro) {
         return userService.registerUser(ro);
@@ -60,5 +66,20 @@ public class AuthenticationController {
     public ResponseEntity<String> createEmailVerification(@RequestBody LinkedHashMap<String,String> body) {
         userService.generateEmailVerification(body.get("username"));
         return new ResponseEntity<String>("Verification code generated, email sent",HttpStatus.OK);
+    }
+
+    @PostMapping("/email/verify")
+    public ApplicationUser verifyEmail(@RequestBody LinkedHashMap<String, String> body) {
+        Long code = Long.parseLong(body.get("code"));
+        String username = body.get("username");
+        return userService.verifyEmail(username, code);
+    }
+
+    @PutMapping("/update/password")
+    public ApplicationUser updatePassword(@RequestBody LinkedHashMap<String, String> body) {
+        String username = body.get("username");
+        String password = body.get("password");
+
+        return userService.setPassword(username, password);
     }
 }
